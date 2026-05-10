@@ -1,0 +1,24 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+# bỏ qua thư mục data
+data/
+
+# Dữ liệu Docker sinh ra (Cực kỳ nặng)
+environment/metabase_data/
+
+environment/artifacts/*
+
+# Dữ liệu (Tùy chọn: Nếu file BIN quá nặng > 100MB thì bỏ comment dòng dưới)
+data/*.BIN
+.env
+# File IDE
+.vscode/
+.idea/
