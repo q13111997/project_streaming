@@ -6,18 +6,17 @@ up:
 down:
 	cd environment && docker compose down 
 
-reset:
-	cd environment && docker compose down -v
-
 setup-hdfs:
 	docker exec -it namenode hdfs dfs -mkdir -p /tmp/checkpoints
 	docker exec -it namenode hdfs dfs -chmod -R 777 /tmp
 
 run:
 	docker exec -it namenode hdfs dfsadmin -safemode leave || true
-	docker exec -it namenode hdfs dfs -touchz /tmp/checkpoint/log_views/* 2>/dev/null || true
 	docker exec -it spark-client bash -c "cd /workspace && PYTHONPATH=/workspace python src/scripts/database_setup.py"
 	docker exec -it spark-client bash -c "cd /workspace && PYTHONPATH=/workspace python -u src/main.py"
+
+remove-checkpoint:
+	docker exec -it namenode hdfs dfs -rm -r -f -skipTrash "/tmp/checkpoint/log_views/*"
 
 bash:
 	docker exec -it spark-client /bin/bash
@@ -89,9 +88,6 @@ top-referrers:
 	ORDER BY total_views DESC \
 	LIMIT 5;"
 
-# usage:
-# make store-views country=Vietnam
-
 store-views:
 	@$(PSQL) "\
 	SELECT \
@@ -108,9 +104,6 @@ store-views:
 	    fl.store_id, \
 	    ds.store_name \
 	ORDER BY total_views DESC;"
-
-# usage:
-# make hourly-product product=P123
 
 hourly-product:
 	@$(PSQL) "\
